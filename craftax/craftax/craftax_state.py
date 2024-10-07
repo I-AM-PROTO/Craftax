@@ -120,6 +120,8 @@ class EnvParams:
 
     god_mode: bool = False
 
+    ladder_open: bool = True
+
     fractal_noise_angles: tuple[int, int, int, int] = (None, None, None, None)
 
 

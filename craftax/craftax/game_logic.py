@@ -2450,6 +2450,7 @@ def change_floor(
     is_moving_down = jnp.logical_and(
         is_moving_down, state.player_level < static_params.num_levels - 1
     )
+    is_moving_down = jnp.logical_and(is_moving_down, env_params.ladder_open)
 
     moving_down_position = state.up_ladders[state.player_level + 1]
 
@@ -2467,6 +2468,7 @@ def change_floor(
         ),
     )
     is_moving_up = jnp.logical_and(is_moving_up, state.player_level > 0)
+    is_moving_up = jnp.logical_and(is_moving_up, env_params.ladder_open)
 
     moving_up_position = state.down_ladders[state.player_level - 1]
 
