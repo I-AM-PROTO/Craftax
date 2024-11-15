@@ -119,6 +119,7 @@ class EnvParams:
     max_attribute: int = 5
 
     god_mode: bool = False
+    easy_mode: bool = False
 
     ladder_open: bool = True
 

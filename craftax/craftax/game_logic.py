@@ -1832,7 +1832,7 @@ def update_mobs(rng, state, params, static_params):
     return state
 
 
-def update_player_intrinsics(state, action, static_params):
+def update_player_intrinsics(state, action, params, static_params):
     # Start sleeping?
     is_starting_sleep = jnp.logical_and(
         action == Action.SLEEP.value, state.player_energy < get_max_energy(state)
@@ -1873,6 +1873,7 @@ def update_player_intrinsics(state, action, static_params):
     )
 
     not_boss = jnp.logical_not(is_fighting_boss(state, static_params))
+    should_decay = jnp.logical_and(not_boss, jnp.logical_not(params.easy_mode))
 
     intrinsic_decay_coeff = 1.0 - (0.125 * (state.player_dexterity - 1))
 
@@ -1880,7 +1881,7 @@ def update_player_intrinsics(state, action, static_params):
     hunger_add = jax.lax.select(state.is_sleeping, 0.5, 1.0) * intrinsic_decay_coeff
     new_hunger = state.player_hunger + hunger_add
 
-    hungered_food = jnp.maximum(state.player_food - 1 * not_boss, 0)
+    hungered_food = jnp.maximum(state.player_food - 1 * should_decay, 0)
     new_food = jax.lax.select(new_hunger > 25, hungered_food, state.player_food)
     new_hunger = jax.lax.select(new_hunger > 25, 0.0, new_hunger)
 
@@ -1892,7 +1893,7 @@ def update_player_intrinsics(state, action, static_params):
     # Thirst
     thirst_add = jax.lax.select(state.is_sleeping, 0.5, 1.0) * intrinsic_decay_coeff
     new_thirst = state.player_thirst + thirst_add
-    thirsted_drink = jnp.maximum(state.player_drink - 1 * not_boss, 0)
+    thirsted_drink = jnp.maximum(state.player_drink - 1 * should_decay, 0)
     new_drink = jax.lax.select(new_thirst > 20, thirsted_drink, state.player_drink)
     new_thirst = jax.lax.select(new_thirst > 20, 0.0, new_thirst)
 
@@ -1910,7 +1911,7 @@ def update_player_intrinsics(state, action, static_params):
 
     new_energy = jax.lax.select(
         new_fatigue > 30,
-        jnp.maximum(state.player_energy - 1 * not_boss, 0),
+        jnp.maximum(state.player_energy - 1 * should_decay, 0),
         state.player_energy,
     )
     new_fatigue = jax.lax.select(new_fatigue > 30, 0.0, new_fatigue)
@@ -3071,7 +3072,7 @@ def craftax_step(rng, state, action, params, static_params):
     state = update_plants(state, static_params)
 
     # Intrinsics
-    state = update_player_intrinsics(state, action, static_params)
+    state = update_player_intrinsics(state, action, params, static_params)
 
     # Cap inv
     state = clip_inventory_and_intrinsics(state, params)
