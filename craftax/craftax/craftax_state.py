@@ -120,6 +120,7 @@ class EnvParams:
 
     god_mode: bool = False
     easy_mode: bool = False
+    monsters_killed_to_clear_level: int = 8
 
     ladder_open: bool = True
 

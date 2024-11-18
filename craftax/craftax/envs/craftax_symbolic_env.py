@@ -61,7 +61,7 @@ class CraftaxSymbolicEnvNoAutoReset(EnvironmentNoAutoReset):
         info["discount"] = self.discount(state, params)
 
         return (
-            lax.stop_gradient(self.get_obs(state)),
+            lax.stop_gradient(self.get_obs(state, params)),
             lax.stop_gradient(state),
             reward,
             done,
@@ -74,10 +74,10 @@ class CraftaxSymbolicEnvNoAutoReset(EnvironmentNoAutoReset):
         rng, _rng = jax.random.split(rng)
         state = generate_world(_rng, params, self.static_env_params)
 
-        return self.get_obs(state), state
+        return self.get_obs(state, params), state
 
-    def get_obs(self, state: EnvState) -> chex.Array:
-        pixels = render_craftax_symbolic(state)
+    def get_obs(self, state: EnvState, params: EnvParams) -> chex.Array:
+        pixels = render_craftax_symbolic(state, params)
         return pixels
 
     def is_terminal(self, state: EnvState, params: EnvParams) -> bool:
@@ -134,7 +134,7 @@ class CraftaxSymbolicEnv(environment.Environment):
         info["discount"] = self.discount(state, params)
 
         return (
-            lax.stop_gradient(self.get_obs(state)),
+            lax.stop_gradient(self.get_obs(state, params)),
             lax.stop_gradient(state),
             reward,
             done,
@@ -149,8 +149,8 @@ class CraftaxSymbolicEnv(environment.Environment):
 
         return self.get_obs(state), state
 
-    def get_obs(self, state: EnvState) -> chex.Array:
-        pixels = render_craftax_symbolic(state)
+    def get_obs(self, state: EnvState, params: EnvParams) -> chex.Array:
+        pixels = render_craftax_symbolic(state, params)
         return pixels
 
     def is_terminal(self, state: EnvState, params: EnvParams) -> bool:

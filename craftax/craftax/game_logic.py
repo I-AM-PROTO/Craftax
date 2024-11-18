@@ -2062,7 +2062,7 @@ def spawn_mobs(state, rng, params, static_params):
 
     monster_spawn_coeff = (
         1
-        + (state.monsters_killed[state.player_level] < MONSTERS_KILLED_TO_CLEAR_LEVEL)
+        + (state.monsters_killed[state.player_level] < params.monsters_killed_to_clear_level)
         * 2
     )  # Triple spawn rate if we are on an uncleared level
 
@@ -2444,7 +2444,7 @@ def change_floor(
             jnp.logical_and(
                 on_down_ladder,
                 state.monsters_killed[state.player_level]
-                >= MONSTERS_KILLED_TO_CLEAR_LEVEL,
+                >= env_params.monsters_killed_to_clear_level,
             ),
         ),
     )

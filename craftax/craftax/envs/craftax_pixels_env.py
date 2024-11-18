@@ -39,7 +39,7 @@ class CraftaxPixelsEnvNoAutoReset(EnvironmentNoAutoReset):
         info["discount"] = self.discount(state, params)
 
         return (
-            lax.stop_gradient(self.get_obs(state)),
+            lax.stop_gradient(self.get_obs(state, params)),
             lax.stop_gradient(state),
             reward,
             done,
@@ -51,10 +51,10 @@ class CraftaxPixelsEnvNoAutoReset(EnvironmentNoAutoReset):
     ) -> Tuple[chex.Array, EnvState]:
         state = generate_world(rng, params, self.static_env_params)
 
-        return self.get_obs(state), state
+        return self.get_obs(state, params), state
 
-    def get_obs(self, state: EnvState) -> chex.Array:
-        pixels = render_craftax_pixels(state, BLOCK_PIXEL_SIZE_AGENT) / 255.0
+    def get_obs(self, state: EnvState, params: EnvParams) -> chex.Array:
+        pixels = render_craftax_pixels(state, params, BLOCK_PIXEL_SIZE_AGENT) / 255.0
         return pixels
 
     def is_terminal(self, state: EnvState, params: EnvParams) -> bool:
@@ -111,7 +111,7 @@ class CraftaxPixelsEnv(environment.Environment):
         info["discount"] = self.discount(state, params)
 
         return (
-            lax.stop_gradient(self.get_obs(state)),
+            lax.stop_gradient(self.get_obs(state, params)),
             lax.stop_gradient(state),
             reward,
             done,
@@ -123,10 +123,10 @@ class CraftaxPixelsEnv(environment.Environment):
     ) -> Tuple[chex.Array, EnvState]:
         state = generate_world(rng, params, self.static_env_params)
 
-        return self.get_obs(state), state
+        return self.get_obs(state, params), state
 
-    def get_obs(self, state: EnvState) -> chex.Array:
-        pixels = render_craftax_pixels(state, BLOCK_PIXEL_SIZE_AGENT) / 255.0
+    def get_obs(self, state: EnvState, params: EnvParams) -> chex.Array:
+        pixels = render_craftax_pixels(state, params, BLOCK_PIXEL_SIZE_AGENT) / 255.0
         return pixels
 
     def is_terminal(self, state: EnvState, params: EnvParams) -> bool:

@@ -2,11 +2,11 @@ import jax
 from functools import partial
 
 from craftax.craftax.constants import *
-from craftax.craftax.craftax_state import EnvState
+from craftax.craftax.craftax_state import EnvState, EnvParams
 from craftax.craftax.util.game_logic_utils import is_boss_vulnerable
 
 
-def render_craftax_symbolic(state: EnvState):
+def render_craftax_symbolic(state: EnvState, env_params: EnvParams):
     map = state.map[state.player_level]
 
     obs_dim_array = jnp.array([OBS_DIM[0], OBS_DIM[1]], dtype=jnp.int32)
@@ -177,7 +177,7 @@ def render_craftax_symbolic(state: EnvState):
             state.learned_spells[0],
             state.learned_spells[1],
             state.player_level / 10.0,
-            state.monsters_killed[state.player_level] >= MONSTERS_KILLED_TO_CLEAR_LEVEL,
+            state.monsters_killed[state.player_level] >= env_params.monsters_killed_to_clear_level,
             is_boss_vulnerable(state),
         ]
     )
@@ -205,7 +205,7 @@ def render_craftax_symbolic(state: EnvState):
         2,
     ),
 )
-def render_craftax_pixels(state, block_pixel_size, do_night_noise=True):
+def render_craftax_pixels(state, env_params, block_pixel_size, do_night_noise=True):
     textures = TEXTURES[block_pixel_size]
     obs_dim_array = jnp.array([OBS_DIM[0], OBS_DIM[1]], dtype=jnp.int32)
 
@@ -269,7 +269,7 @@ def render_craftax_pixels(state, block_pixel_size, do_night_noise=True):
 
     # Insert blocked ladders
     is_ladder_down_open = (
-        state.monsters_killed[state.player_level] >= MONSTERS_KILLED_TO_CLEAR_LEVEL
+        state.monsters_killed[state.player_level] >= env_params.monsters_killed_to_clear_level
     )
     ladder_down_item = jax.lax.select(
         is_ladder_down_open,
@@ -905,7 +905,7 @@ def render_craftax_pixels(state, block_pixel_size, do_night_noise=True):
     return pixels
 
 
-def render_craftax_text(state: EnvState):
+def render_craftax_text(state: EnvState, env_params: EnvParams):
 
     text_obs = "Map:\n"
 
@@ -1207,7 +1207,7 @@ def render_craftax_text(state: EnvState):
     text_obs += f"Learned Fireball: {state.learned_spells[0]}\n"
     text_obs += f"Learned Iceball: {state.learned_spells[1]}\n"
     text_obs += f"Floor: {state.player_level}\n"
-    text_obs += f"Ladder Open: {state.monsters_killed[state.player_level] >= MONSTERS_KILLED_TO_CLEAR_LEVEL}\n"
+    text_obs += f"Ladder Open: {state.monsters_killed[state.player_level] >= env_params.monsters_killed_to_clear_level}\n"
     text_obs += f"Is Boss Vulnerable: {is_boss_vulnerable(state)}\n"
 
     return text_obs

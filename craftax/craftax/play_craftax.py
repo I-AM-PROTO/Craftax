@@ -96,7 +96,7 @@ class CraftaxRenderer:
 
         self.screen_surface = pygame.display.set_mode(self.screen_size)
 
-        self._render = jax.jit(render_craftax_pixels, static_argnums=(1,))
+        self._render = jax.jit(render_craftax_pixels, static_argnums=(1,2,))
 
     def update(self):
         # Update pygame events
