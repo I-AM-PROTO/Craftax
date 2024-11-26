@@ -523,7 +523,7 @@ def do_action(rng, state, action, static_params):
     return state
 
 
-def do_crafting(state, action):
+def do_crafting(state, action, params):
     is_at_crafting_table = is_near_block(state, BlockType.CRAFTING_TABLE.value)
     is_at_furnace = is_near_block(state, BlockType.FURNACE.value)
 
@@ -698,10 +698,11 @@ def do_crafting(state, action):
     )
 
     # Iron armour
+    armour_cost = params.armour_cost
     can_craft_iron_armour = (new_inventory.armour < 1).sum() > 0
     can_craft_iron_armour = jnp.logical_and(
         can_craft_iron_armour,
-        jnp.logical_and(new_inventory.iron >= 3, new_inventory.coal >= 3),
+        jnp.logical_and(new_inventory.iron >= armour_cost, new_inventory.coal >= armour_cost),
     )
 
     iron_armour_index_to_craft = jnp.argmax(new_inventory.armour < 1)
@@ -715,8 +716,8 @@ def do_crafting(state, action):
     )
 
     new_inventory = new_inventory.replace(
-        iron=new_inventory.iron - 3 * is_crafting_iron_armour,
-        coal=new_inventory.coal - 3 * is_crafting_iron_armour,
+        iron=new_inventory.iron - armour_cost * is_crafting_iron_armour,
+        coal=new_inventory.coal - armour_cost * is_crafting_iron_armour,
         armour=new_inventory.armour.at[iron_armour_index_to_craft].set(
             is_crafting_iron_armour * 1
             + (1 - is_crafting_iron_armour)
@@ -733,7 +734,7 @@ def do_crafting(state, action):
     # Diamond armour
     can_craft_diamond_armour = (new_inventory.armour < 2).sum() > 0
     can_craft_diamond_armour = jnp.logical_and(
-        can_craft_diamond_armour, new_inventory.diamond >= 3
+        can_craft_diamond_armour, new_inventory.diamond >= armour_cost
     )
 
     diamond_armour_index_to_craft = jnp.argmax(new_inventory.armour < 2)
@@ -747,7 +748,7 @@ def do_crafting(state, action):
     )
 
     new_inventory = new_inventory.replace(
-        diamond=new_inventory.diamond - 3 * is_crafting_diamond_armour,
+        diamond=new_inventory.diamond - armour_cost * is_crafting_diamond_armour,
         armour=new_inventory.armour.at[diamond_armour_index_to_craft].set(
             is_crafting_diamond_armour * 2
             + (1 - is_crafting_diamond_armour)
@@ -3026,7 +3027,7 @@ def craftax_step(rng, state, action, params, static_params):
     state = change_floor(state, action, params, static_params)
 
     # Crafting
-    state = do_crafting(state, action)
+    state = do_crafting(state, action, params)
 
     # Interact (mining, melee attacking, eating plants, drinking water)
     rng, _rng = jax.random.split(rng)

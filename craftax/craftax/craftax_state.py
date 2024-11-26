@@ -119,8 +119,11 @@ class EnvParams:
     max_attribute: int = 5
 
     god_mode: bool = False
+    
+    # Difficulty control params
     easy_mode: bool = False
     monsters_killed_to_clear_level: int = 8
+    armour_cost: int = 3
 
     ladder_open: bool = True
 
