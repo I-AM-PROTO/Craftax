@@ -122,6 +122,7 @@ class EnvParams:
     
     # Difficulty control params
     easy_mode: bool = False
+    start_with_iron_armour: bool = False
     monsters_killed_to_clear_level: int = 8
     armour_cost: int = 3
 

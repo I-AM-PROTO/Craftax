@@ -41,6 +41,35 @@ def get_new_empty_inventory():
         armour=jnp.array([0, 0, 0, 0], dtype=jnp.int32),
     )
 
+def get_new_iron_armoured_inventory():
+    return Inventory(
+        wood=jnp.asarray(0, dtype=jnp.int32),
+        stone=jnp.asarray(0, dtype=jnp.int32),
+        coal=jnp.asarray(0, dtype=jnp.int32),
+        iron=jnp.asarray(0, dtype=jnp.int32),
+        diamond=jnp.asarray(0, dtype=jnp.int32),
+        sapling=jnp.asarray(0, dtype=jnp.int32),
+        pickaxe=jnp.asarray(0, dtype=jnp.int32),
+        sword=jnp.asarray(0, dtype=jnp.int32),
+        bow=jnp.asarray(0, dtype=jnp.int32),
+        arrows=jnp.asarray(0, dtype=jnp.int32),
+        torches=jnp.asarray(0, dtype=jnp.int32),
+        ruby=jnp.asarray(0, dtype=jnp.int32),
+        sapphire=jnp.asarray(0, dtype=jnp.int32),
+        books=jnp.asarray(0, dtype=jnp.int32),
+        potions=jnp.array(
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
+            dtype=jnp.int32,
+        ),
+        armour=jnp.array([1, 1, 1, 1], dtype=jnp.int32),
+    )
 
 def get_new_full_inventory():
     return Inventory(
@@ -645,6 +674,11 @@ def generate_world(rng, params, static_params):
         lambda x, y: jax.lax.select(params.god_mode, x, y),
         get_new_full_inventory(),
         get_new_empty_inventory(),
+    )
+    inventory = jax.tree_util.tree_map(
+        lambda x, y: jax.lax.select(params.start_with_iron_armour, x, y),
+        get_new_iron_armoured_inventory(),
+        inventory,
     )
 
     rng, _rng = jax.random.split(rng)
